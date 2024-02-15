@@ -1,29 +1,44 @@
 import processing.serial.*;
 
-float waterLevel;          // Livello dell'acqua nella vasca
-float setpointLevel = 100; // Livello del regolatore
-float pumpRate = 2.4;      // Velocità di estrazione dell'acqua dalla pompa
-float pipeFlow = 3.5;      // Velocità di flusso dell'acqua dal tubo superiore
-PImage img;
-Serial port;
-
 public
 enum ModelType { PUMP_IN_THE_INLET, PUMP_IN_THE_OUTLET; }
 
-public
-enum  SerialCommand { getProcessValue; }
+public enum SerialCommand {
+    getProcessValue;
+
+    public SerialCommand fromInteger(int x) {
+        switch (x) {
+          case 0: return getProcessValue; 
+        default: return null;
+    }
+  }
+}
+
+int setPoint, actualValue, maxValue;
+int setPointPixel, actualValuePixel;
+
+PImage img;
+Serial port;
+
+long now, timeout = 1000000000, timeoutEventCounter, communicationFrameCount;
+
+PFont font;
 
 ModelType Model = ModelType.PUMP_IN_THE_INLET;
+
 int Tank_originx, Tank_originy;
 int Tank_sizex, Tank_sizey;
+int phase = 0;
 
 void setup()
 {
     size(600, 300);
 
+    font = createFont("Arial", 20);
+
     printArray(Serial.list());
     port = new Serial(this, Serial.list()[0], 115200);
-    
+
     // initialize model image
     switch (Model) {
     case PUMP_IN_THE_INLET:
@@ -42,9 +57,9 @@ void setup()
         break;
     }
 
-    waterLevel = Tank_sizey / 2; // L'acqua inizia al centro della vasca
+    actualValuePixel = Tank_sizey / 2; // L'acqua inizia al centro della vasca
 
-    frameRate(5);
+    frameRate(20);
 }
 
 void draw()
@@ -58,30 +73,90 @@ void draw()
     fill(150, 200, 255);
     rect(Tank_originx, Tank_originy, Tank_sizex, Tank_sizey);
 
-    // Estrae l'acqua dalla pompa
-    waterLevel -= pumpRate;
-
-    // Immette l'acqua dal tubo superiore
-    waterLevel += pipeFlow;
-
     // Assicura che il livello dell'acqua rimanga entro i limiti della vasca
-    waterLevel = constrain(waterLevel, 0, Tank_sizey);
+    actualValuePixel = constrain(actualValuePixel, 0, Tank_sizey);
 
-    if (waterLevel > 0) {
+    if (actualValuePixel > 0) {
         // Disegna l'acqua nella vasca
         fill(0, 100, 255);
-        rect(Tank_originx, Tank_originy + Tank_sizey - waterLevel, Tank_sizex, waterLevel);
+        rect(Tank_originx,
+             Tank_originy + Tank_sizey - actualValuePixel,
+             Tank_sizex,
+             actualValuePixel);
     }
 
     // Draw the setpoint
-    if (setpointLevel > 0) {
+    if (setPointPixel > 0) {
         // Assicura che il livello dell'acqua rimanga entro i limiti della vasca
-        setpointLevel = constrain(setpointLevel, 0, Tank_sizey);
+        setPointPixel = constrain(setPointPixel, 0, Tank_sizey);
 
         // Disegna un segno orizzontale
         fill(255, 0, 0);
-        rect(Tank_originx, Tank_originy + Tank_sizey - setpointLevel, Tank_sizex, 1);
+        rect(Tank_originx, Tank_originy + Tank_sizey - setPointPixel, Tank_sizex, 1);
     }
 
+    communication();
+    
     noStroke();
+
+    // Print counter value
+    fill(0);
+    textFont(font);
+    textAlign(CENTER);
+    text(nf(timeoutEventCounter, 0, 0), width / 2, (height / 3));
+
+    // Print counter value
+    fill(0);
+    textFont(font);
+    textAlign(CENTER);
+    text(nf(communicationFrameCount,0 ,0), width / 2, ((height / 3) * 2));
+
+}
+
+void communication()
+{ //<>//
+    switch (phase) {
+      
+    case 0:
+        port.write(SerialCommand.getProcessValue.ordinal() + '\n');
+        now = System.nanoTime();
+        phase = 1;
+        break;
+
+    case 1:
+        // Check incoming serial string to update ValueA0 & A1
+        if (port.available() > 0) {
+            String command = port.readStringUntil('\n');
+            if (command != null) {
+                String[] s = split(command, ",");
+
+                if (s.length > 0) {
+                    SerialCommand cmd = SerialCommand.getProcessValue;
+                    if (s[0].length() > 0)
+                        cmd.fromInteger(Integer.parseInt(s[0].trim()));
+
+                    switch (cmd) {
+                    case getProcessValue:
+                        if (s.length == 4) {
+                            if (s[1].length() > 0)
+                                actualValue = Integer.parseInt(s[1].trim());
+                            if (s[2].length() > 0)
+                                setPoint = Integer.parseInt(s[2].trim());
+                            if (s[3].length() > 0)
+                                maxValue = Integer.parseInt(s[3].trim());
+
+                            communicationFrameCount++;
+                        }
+                    }
+                }
+            }
+            phase = 0;
+        }
+        if (System.nanoTime() - now >= timeout) {
+            timeoutEventCounter++;
+            phase = 0;
+        }
+
+        break;
+    }
 }

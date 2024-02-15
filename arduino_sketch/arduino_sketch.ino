@@ -8,9 +8,18 @@ int setPoint, actualValue, maxValue;
 
 void setup() {
 
-  // initialize serial and pwm pins
+  // initialize serial. Set timeout to 1msec Serial.available()
+  // don't relax loop rate.
   Serial.begin(115200);
+  Serial.setTimeout(1);
 
+  // only for debug purpose
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  // static values for debug
+  setPoint = 10;
+  actualValue = 5;
+  maxValue = 100;
 }
 
 void loop() {
@@ -20,26 +29,25 @@ void loop() {
     cmd = Serial.parseInt();
     switch (cmd) {
       case getProcessValue:
-      break;
-      
+        // toggle builtin led for debug purpose
+        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+        break;
     }
-    Serial.read();
+    Serial.flush();
 
+    // compose reply frame
     switch (cmd) {
       case getProcessValue:
-
         Serial.print(cmd);
         Serial.print(',');
         Serial.print(actualValue);
-        Serial.print(','); 
+        Serial.print(',');
         Serial.print(setPoint);
         Serial.print(',');
         Serial.println(maxValue);
-
-      break;
-      
+        break;
     }
   }
 
-  delay(500);
+  delay(50);
 }
