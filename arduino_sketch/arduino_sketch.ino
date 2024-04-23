@@ -1,53 +1,71 @@
+/*
+  Tank level controller
 
-typedef enum {
-  getProcessValue
-} SerialCommand;
+  by Giuliano Tognon
+*/
 
-SerialCommand cmd;
-int setPoint, actualValue, maxValue;
+#include <ArduinoRS485.h>
+#include <ArduinoModbus.h>
+
+const int ledPin = LED_BUILTIN;
+int setpoit, measure;
+int freerunningCounter, output;
+int debug;
+
+unsigned long previousMillis = 0;
+const long interval = 100;
+
+int regulator(int measure, int setpoit, float interval) {
+  return debug++;
+}
 
 void setup() {
+  Serial.begin(9600);
+  Serial.println("Modbus RTU Server LED");
 
-  // initialize serial. Set timeout to 1msec Serial.available()
-  // don't relax loop rate.
-  Serial.begin(115200);
-  Serial.setTimeout(1);
+  // start the Modbus RTU server, with (slave) id 1
+  if (!ModbusRTUServer.begin(1, 115200)) {
+    Serial.println("Failed to start Modbus RTU Server!");
+    while (1);
+  }
 
-  // only for debug purpose
+  // configure the LED
   pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
 
-  // static values for debug
-  setPoint = 10;
-  actualValue = 5;
-  maxValue = 100;
+  // configure four holding registers at address 0x00
+  ModbusRTUServer.configureHoldingRegisters(0x00,4);
 }
 
 void loop() {
+  // poll for Modbus RTU requests
+  int packetReceived = ModbusRTUServer.poll();
 
-  // check for incoming serial data
-  if (Serial.available() > 0) {
-    cmd = Serial.parseInt();
-    switch (cmd) {
-      case getProcessValue:
-        // toggle builtin led for debug purpose
-        digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-        break;
-    }
-    Serial.flush();
+  if(packetReceived) {
 
-    // compose reply frame
-    switch (cmd) {
-      case getProcessValue:
-        Serial.print(cmd);
-        Serial.print(',');
-        Serial.print(actualValue);
-        Serial.print(',');
-        Serial.print(setPoint);
-        Serial.print(',');
-        Serial.println(maxValue);
-        break;
+    // read the current value of the wrote holding registers
+    setpoit = ModbusRTUServer.holdingRegisterRead(0x00);
+    measure = ModbusRTUServer.holdingRegisterRead(0x01);
+  
+    if (setpoit) {
+      // coil value set, turn LED on
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else {
+      // coil value clear, turn LED off
+      digitalWrite(LED_BUILTIN, LOW);
     }
   }
 
-  delay(50);
+
+  // check to see if it's time to execute regulator
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    // save the last time you blinked the LED
+    previousMillis = currentMillis;
+    output = regulator(measure, setpoit, (interval/1000.0));
+  }
+
+  ModbusRTUServer.holdingRegisterWrite(0x02, freerunningCounter++);
+  ModbusRTUServer.holdingRegisterWrite(0x03, output);
 }
