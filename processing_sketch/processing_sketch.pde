@@ -1,21 +1,35 @@
 import processing.serial.*;
 
 public
-enum ModelType { PUMP_IN_THE_INLET, PUMP_IN_THE_OUTLET; }
+enum ModelType { 
+  PUMP_IN_THE_INLET, 
+  PUMP_IN_THE_OUTLET;
 
-public enum SerialCommand {
-    getProcessValue;
-
-    public SerialCommand fromInteger(int x) {
+    public ModelType fromInteger(int x) {
         switch (x) {
-          case 0: return getProcessValue; 
+          case 0: return PUMP_IN_THE_INLET; 
+          case 1: return PUMP_IN_THE_OUTLET; 
         default: return null;
     }
   }
 }
 
-int setPoint, actualValue, maxValue;
-int setPointPixel, actualValuePixel;
+public enum SerialCommand {
+    getConfigValue,
+    getProcessValue;
+
+    public SerialCommand fromInteger(int x) {
+        switch (x) {
+          case 0: return getConfigValue; 
+          case 1: return getProcessValue; 
+        default: return null;
+    }
+  }
+}
+
+float setPointValue, actualValue, maxSetPointValue;
+float setPointValuePixel, actualValuePixel;
+float outputValue, maxOutputValue;
 
 PImage img;
 Serial port;
@@ -26,8 +40,8 @@ PFont font;
 
 ModelType Model = ModelType.PUMP_IN_THE_INLET;
 
-int Tank_originx, Tank_originy;
-int Tank_sizex, Tank_sizey;
+float Tank_originx, Tank_originy;
+float Tank_sizex, Tank_sizey;
 int phase = 0;
 
 void setup()
@@ -40,22 +54,7 @@ void setup()
     port = new Serial(this, Serial.list()[0], 115200);
 
     // initialize model image
-    switch (Model) {
-    case PUMP_IN_THE_INLET:
-        img = loadImage("PUMP_IN_THE_INLET.png");
-        Tank_originx = 207;
-        Tank_originy = 106;
-        Tank_sizex = 206;
-        Tank_sizey = 164;
-        break;
-    case PUMP_IN_THE_OUTLET:
-        img = loadImage("PUMP_IN_THE_OUTLET.png");
-        Tank_originx = 21;
-        Tank_originy = 97;
-        Tank_sizex = 206;
-        Tank_sizey = 164;
-        break;
-    }
+    init_model_image();
 
     actualValuePixel = Tank_sizey / 2; // L'acqua inizia al centro della vasca
 
@@ -73,6 +72,8 @@ void draw()
     fill(150, 200, 255);
     rect(Tank_originx, Tank_originy, Tank_sizex, Tank_sizey);
 
+    actualValuePixel = map(actualValue, 0, maxSetPointValue, 0, Tank_sizey);
+
     // Assicura che il livello dell'acqua rimanga entro i limiti della vasca
     actualValuePixel = constrain(actualValuePixel, 0, Tank_sizey);
 
@@ -86,13 +87,13 @@ void draw()
     }
 
     // Draw the setpoint
-    if (setPointPixel > 0) {
+    if (setPointValuePixel > 0) {
         // Assicura che il livello dell'acqua rimanga entro i limiti della vasca
-        setPointPixel = constrain(setPointPixel, 0, Tank_sizey);
+        setPointValuePixel = constrain(setPointValuePixel, 0, Tank_sizey);
 
         // Disegna un segno orizzontale
         fill(255, 0, 0);
-        rect(Tank_originx, Tank_originy + Tank_sizey - setPointPixel, Tank_sizex, 1);
+        rect(Tank_originx, Tank_originy + Tank_sizey - setPointValuePixel, Tank_sizex, 1);
     }
 
     communication();
@@ -114,44 +115,66 @@ void draw()
 }
 
 void communication()
-{ //<>//
+{
     switch (phase) {
       
     case 0:
-        port.write(SerialCommand.getProcessValue.ordinal() + '\n');
+        port.write('1' + '\n');
         now = System.nanoTime();
-        phase = 1;
+        phase = 2;
         break;
 
     case 1:
-        // Check incoming serial string to update ValueA0 & A1
+        //port.write(SerialCommand.getProcessValue.ordinal() + '\n');
+        port.write('1' + '\n');
+        now = System.nanoTime();
+        phase = 2; //<>//
+        break;
+
+    case 2:
+        // Check incoming serial string
         if (port.available() > 0) {
             String command = port.readStringUntil('\n');
             if (command != null) {
                 String[] s = split(command, ",");
 
-                if (s.length > 0) {
-                    SerialCommand cmd = SerialCommand.getProcessValue;
+                if (s.length > 0) { //<>//
+                    SerialCommand cmd = SerialCommand.getConfigValue;
                     if (s[0].length() > 0)
-                        cmd.fromInteger(Integer.parseInt(s[0].trim()));
+                        cmd = cmd.fromInteger(Integer.parseInt(s[0].trim()));
 
                     switch (cmd) {
+                      
+                    case getConfigValue:
+                        if (s.length == 4) {
+                            if (s[1].length() > 0)
+                                Model = Model.fromInteger(Integer.parseInt(s[1].trim()));
+                            if (s[2].length() > 0)
+                                maxSetPointValue = Integer.parseInt(s[2].trim());
+                            if (s[3].length() > 0)
+                                maxOutputValue = Integer.parseInt(s[3].trim());
+                                
+                                init_model_image(); //<>//
+                        }   
+                        break;
                     case getProcessValue:
                         if (s.length == 4) {
                             if (s[1].length() > 0)
                                 actualValue = Integer.parseInt(s[1].trim());
                             if (s[2].length() > 0)
-                                setPoint = Integer.parseInt(s[2].trim());
+                                setPointValue = Integer.parseInt(s[2].trim());
                             if (s[3].length() > 0)
-                                maxValue = Integer.parseInt(s[3].trim());
+                                outputValue = Integer.parseInt(s[3].trim());
 
                             communicationFrameCount++;
                         }
+                   break;
                     }
                 }
             }
             phase = 0;
         }
+
         if (System.nanoTime() - now >= timeout) {
             timeoutEventCounter++;
             phase = 0;
@@ -160,3 +183,22 @@ void communication()
         break;
     }
 }
+
+void init_model_image(){
+    switch (Model) {
+    case PUMP_IN_THE_INLET:
+        img = loadImage("PUMP_IN_THE_INLET.png");
+        Tank_originx = 207;
+        Tank_originy = 106;
+        Tank_sizex = 206;
+        Tank_sizey = 164;
+        break;
+    case PUMP_IN_THE_OUTLET:
+        img = loadImage("PUMP_IN_THE_OUTLET.png");
+        Tank_originx = 21;
+        Tank_originy = 97;
+        Tank_sizex = 206;
+        Tank_sizey = 164;
+        break;
+    }
+  }
