@@ -9,13 +9,14 @@
 
 int setpoint, measure;
 int freerunningCounter, output;
+int test;
 
 unsigned long previousMillis = 0;
 const long interval = 100;
 
 int regulator(int measure, int setpoint, float interval)
 {
-    return 1;
+    return test++;
 }
 
 void setup()
@@ -40,11 +41,10 @@ void loop()
         measure = ModbusRTUServer.holdingRegisterRead(0x01);
     }
 
-    // check to see if it's time to execute regulator
+    // check to see if it's time to execute regulator()
     unsigned long currentMillis = millis();
-
     if (currentMillis - previousMillis >= interval) {
-        // save the last time you blinked the LED
+        // save the last time you execute regulator()
         previousMillis = currentMillis;
         output = regulator(measure, setpoint, (interval/1000.0));
     }
