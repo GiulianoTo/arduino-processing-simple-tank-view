@@ -61,6 +61,12 @@ int test;
 final int lineSpacing = 13;
 int horizontalPosition = 0;
 
+// model parameter
+float MaxTankLevel, TankArea, OutputValveCoefficient, InitialTankLevel;
+
+// runtime model data
+float CurrentTankVolume, CurrentTankLevel, CurrentQi, CurrentQu;
+
 void setup()
 {
   size(600, 600);
@@ -153,6 +159,7 @@ void draw()
   textAlign(LEFT);
  //<>//
   updateDebugTab();
+  updateMainTab();
 }
 
 void init_model_image(){

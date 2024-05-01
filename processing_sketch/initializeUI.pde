@@ -29,17 +29,46 @@ void createTabs()
 
 }
 
+
+controlP5.Textfield volf, levelf, qif, quf;
+int mainTop = 30, mainLeft = 10, mainW=100, mainH=20, mainLineSpacing = 50, mainFontSize = 12;
+
+
 void populateMainTab()
 {
+  volf = controlP5.addTextfield("Volume[m2]", mainLeft, mainTop, mainW, mainH);
+  volf.moveTo("default"); 
+  volf.setFont(createFont("arial",mainFontSize));
+  
+  mainTop += mainLineSpacing;
+  levelf = controlP5.addTextfield("Level[m]", mainLeft, mainTop, mainW, mainH);
+  levelf.moveTo("default"); 
+  levelf.setFont(createFont("arial",mainFontSize));
 
+  mainTop += mainLineSpacing;
+  qif = controlP5.addTextfield("qi[m2/s]", mainLeft, mainTop, mainW, mainH);
+  qif.moveTo("default"); 
+  qif.setFont(createFont("arial",mainFontSize));
 
+  mainTop += mainLineSpacing;
+  quf = controlP5.addTextfield("qu[m2/s]", mainLeft, mainTop, mainW, mainH);
+  quf.moveTo("default"); 
+  quf.setFont(createFont("arial",mainFontSize));
 }
 
+void updateMainTab()
+{
+  volf.setText(str(CurrentTankVolume));
+  levelf.setText(str(CurrentTankLevel));
+  qif.setText(str(CurrentQi));
+  quf.setText(str(CurrentQu));
+}
 
 controlP5.Button ConnectButton, DisconnectButton;
 controlP5.Textlabel Connecting;
 DropdownList r1;
-int commTop = 30, commLeft = 10, commW=160, commH=180;
+int commTop = 30, commLeft = 10, commW=160, commH=180, setupLineSpacing = 50, setupFontSize = 12;
+controlP5.Textfield maxLevelf, areaf, cf, initLevelf;
 
 void populateSetupTab()
 {
@@ -71,10 +100,32 @@ void populateSetupTab()
 
   DisconnectButton.setVisible(false);
   Connecting.setVisible(false);
-  
+
   ConnectButton.moveTo("Tab2"); 
   DisconnectButton.moveTo("Tab2");
   r1.moveTo("Tab2");
+
+  commTop = 100;
+  commH = 20;
+  maxLevelf = controlP5.addTextfield("MaxLevel[m] ", commLeft, commTop, commW, commH);
+  maxLevelf.moveTo("Tab2"); 
+  maxLevelf.setFont(createFont("arial",setupFontSize));
+   
+  commTop += setupLineSpacing;
+  areaf = controlP5.addTextfield("Area[m2] ", commLeft, commTop, commW, commH);
+  areaf.moveTo("Tab2"); 
+  areaf.setFont(createFont("arial",setupFontSize));
+  
+  commTop += setupLineSpacing;
+  cf = controlP5.addTextfield("C[?] ", commLeft, commTop, commW, commH);
+  cf.moveTo("Tab2"); 
+  cf.setFont(createFont("arial",setupFontSize));
+  
+  commTop += setupLineSpacing;
+  initLevelf = controlP5.addTextfield("InitLevel[m] ", commLeft, commTop, commW, commH);
+  initLevelf.moveTo("Tab2"); 
+  initLevelf.setFont(createFont("arial",setupFontSize));
+   
 }
 
 controlP5.Textfield cnf, outf, setpf, measf, p0sf, p1sf;
