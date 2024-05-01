@@ -5,6 +5,7 @@
 */
 
 import processing.serial.*;
+import controlP5.*;
 
 // Serial port communication setup
 Serial myPort;
@@ -21,6 +22,26 @@ int polling = 10;
 int no_of_retries = 10;
 int total_no_of_packets = 2;
 Packet[] packets = new Packet[total_no_of_packets];
+
+// UI setup
+ControlP5 controlP5;
+controlP5.Button AMButton, DRButton, ATButton, ProfButton, ProfCmd, ProfCmdStop;
+controlP5.Textlabel AMLabel, AMCurrent, InLabel, 
+  OutLabel, SPLabel, PLabel, 
+  ILabel, DLabel, DRLabel, DRCurrent, ATLabel, 
+  oSLabel, nLabel, ATCurrent, lbLabel, 
+  profSelLabel, commconfigLabel1, commconfigLabel2;
+controlP5.Tab mainTab;
+RadioButton r2, r3;
+
+String[] CommPorts;
+
+int dashTop = 200, dashLeft = 10, dashW=160, dashH=180; 
+int tuneTop = 30, tuneLeft = 10, tuneW=160, tuneH=180;
+int ATTop = 230, ATLeft = 10, ATW=160, ATH=180;
+ 
+int configTop = 30, configLeft = 10, configW=160, configH=200;
+int RsTop = configTop+2*configH+30, RsLeft = 10, RsW=160, RsH=30;
 
 float setPointValue, actualValue, maxSetPointValue;
 float setPointValuePixel, actualValuePixel;
@@ -46,6 +67,8 @@ void setup()
 
   font = createFont("Arial", 10);
 
+  controlP5 = new ControlP5(this); 
+  
   // init the Serial port instance
   myPort = new Serial(this, commPort, baud, parity, dataBits, stopBits);
   
@@ -61,6 +84,13 @@ void setup()
   // initialize model image
   init_model_image();
 
+  // Initialize UI
+  createTabs();
+  populateMainTab();
+  populateSetupTab();
+  populateDebugTab();
+
+
   maxSetPointValue = 525;
   actualValue = 250;
   maxOutputValue = 100;
@@ -75,7 +105,7 @@ void draw()
   port_one.update();
 
   // Displays the image at its actual size at point (0,0)
-  image(img, 0, 0);
+  //image(img, 0, 0);
 
   // Draw the tank
   fill(150, 200, 255);
@@ -121,8 +151,8 @@ void draw()
 
   textFont(font);
   textAlign(LEFT);
-  display_debug_infos();
- //<>// //<>// //<>//
+ //<>//
+  updateDebugTab();
 }
 
 void init_model_image(){
@@ -131,37 +161,4 @@ void init_model_image(){
   Tank_originy = 106;
   Tank_sizex = 206;
   Tank_sizey = 164;
-}
-
-void display_debug_infos() {
-  // Display the registers received using function 3
-  horizontalPosition = 300;
-  
-  text("freerunningCounter:  " + readRegs[0], 10, (horizontalPosition += lineSpacing));
-  text("output:  " + readRegs[1], 10, (horizontalPosition += lineSpacing));
-  text("setpoint:  " + writeRegs[0], 10, (horizontalPosition += lineSpacing));
-  text("measure:  " + writeRegs[1], 10, (horizontalPosition += lineSpacing));
-  
-  
-  // Check packet0 main counters to verify that communication
-  // is working as expected.  
-  horizontalPosition += lineSpacing;
-  text("Packet0", 10, (horizontalPosition += lineSpacing));  
-  text("requests:  " + packets[0].requests, 10, (horizontalPosition += lineSpacing));
-  text("successful_requests:  " + packets[0].successful_requests, 10, (horizontalPosition += lineSpacing));
-  text("failed_requests:  " + packets[0].failed_requests, 10, (horizontalPosition += lineSpacing));
-  text("retries:  " + packets[0].retries, 10, (horizontalPosition += lineSpacing));
-  text("exception_errors:  " + packets[0].exception_errors, 10, (horizontalPosition += lineSpacing));
-  text("connection:  " + packets[0].connection, 10, (horizontalPosition += lineSpacing));
-  
-  // Check packet1 main counters to verify that communication
-  // is working as expected.  
-  horizontalPosition += lineSpacing;
-  text("Packet1", 10, (horizontalPosition += lineSpacing));  
-  text("requests:  " + packets[1].requests, 10, (horizontalPosition += lineSpacing));
-  text("successful_requests:  " + packets[1].successful_requests, 10, (horizontalPosition += lineSpacing));
-  text("failed_requests:  " + packets[1].failed_requests, 10, (horizontalPosition += lineSpacing));
-  text("retries:  " + packets[1].retries, 10, (horizontalPosition += lineSpacing));
-  text("exception_errors:  " + packets[1].exception_errors, 10, (horizontalPosition += lineSpacing));
-  text("connection:  " + packets[1].connection, 10, (horizontalPosition += lineSpacing));
 }
