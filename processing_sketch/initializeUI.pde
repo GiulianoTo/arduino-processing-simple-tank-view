@@ -1,3 +1,6 @@
+controlP5.Tab mainTab;
+
+
 void createTabs()
 {
   // in case you want to receive a controlEvent when
@@ -66,9 +69,11 @@ void updateMainTab()
 
 controlP5.Button ConnectButton, DisconnectButton;
 controlP5.Textlabel Connecting;
+String[] CommPorts;
 DropdownList r1;
 int commTop = 30, commLeft = 10, commW=160, commH=180, setupLineSpacing = 50, setupFontSize = 12;
-controlP5.Textfield maxLevelf, areaf, cf, initLevelf;
+controlP5.Textfield maxLevelf, areaf, cf, initLevelf, qimaxf;
+int dashTop = 200, dashLeft = 10, dashW=160, dashH=180; 
 
 void populateSetupTab()
 {
@@ -126,6 +131,19 @@ void populateSetupTab()
   initLevelf.moveTo("Tab2"); 
   initLevelf.setFont(createFont("arial",setupFontSize));
    
+  commTop += setupLineSpacing;
+  qimaxf = controlP5.addTextfield("qimax[m2/s] ", commLeft, commTop, commW, commH);
+  qimaxf.moveTo("Tab2"); 
+  qimaxf.setFont(createFont("arial",setupFontSize)); 
+}
+
+void updateSetupTab()
+{
+  maxLevelf.setText(str(MaxTankLevel));
+  areaf.setText(str(TankArea));
+  cf.setText(str(OutputValveCoefficient));
+  initLevelf.setText(str(InitialTankLevel));
+  qimaxf.setText(str(MaxQi));
 }
 
 controlP5.Textfield cnf, outf, setpf, measf, p0sf, p1sf;

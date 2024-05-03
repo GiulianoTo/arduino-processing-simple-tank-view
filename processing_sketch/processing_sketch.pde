@@ -22,54 +22,30 @@ int polling = 10;
 int no_of_retries = 10;
 int total_no_of_packets = 2;
 Packet[] packets = new Packet[total_no_of_packets];
-
-// UI setup
-ControlP5 controlP5;
-controlP5.Button AMButton, DRButton, ATButton, ProfButton, ProfCmd, ProfCmdStop;
-controlP5.Textlabel AMLabel, AMCurrent, InLabel, 
-  OutLabel, SPLabel, PLabel, 
-  ILabel, DLabel, DRLabel, DRCurrent, ATLabel, 
-  oSLabel, nLabel, ATCurrent, lbLabel, 
-  profSelLabel, commconfigLabel1, commconfigLabel2;
-controlP5.Tab mainTab;
-RadioButton r2, r3;
-
-String[] CommPorts;
-
-int dashTop = 200, dashLeft = 10, dashW=160, dashH=180; 
-int tuneTop = 30, tuneLeft = 10, tuneW=160, tuneH=180;
-int ATTop = 230, ATLeft = 10, ATW=160, ATH=180;
- 
-int configTop = 30, configLeft = 10, configW=160, configH=200;
-int RsTop = configTop+2*configH+30, RsLeft = 10, RsW=160, RsH=30;
-
-float setPointValue, actualValue, maxSetPointValue;
-float setPointValuePixel, actualValuePixel;
-float outputValue, maxOutputValue;
-
-PImage img;
-PFont font;
-
-float Tank_originx, Tank_originy;
-float Tank_sizex, Tank_sizey;
-
 int[] readRegs = new int[2]; // store data read from Arduino
 int[] writeRegs = new int[2]; // store data write for Arduino
 
+// UI setup
+ControlP5 controlP5;
+PImage img;
+PFont font;
+
+float setPointValuePixel, actualValuePixel;
+float Tank_originx, Tank_originy;
+float Tank_sizex, Tank_sizey;
+
 int previousMillis = 0;
 int test;
-final int lineSpacing = 13;
-int horizontalPosition = 0;
 
 // model parameter
-float MaxTankLevel, TankArea, OutputValveCoefficient, InitialTankLevel;
+float MaxTankLevel, TankArea, OutputValveCoefficient, InitialTankLevel, MaxQi;
 
 // runtime model data
-float CurrentTankVolume, CurrentTankLevel, CurrentQi, CurrentQu;
+float CurrentTankVolume, CurrentTankLevel, SetPointTankLevel, CurrentQi, CurrentQu;
 
 void setup()
 {
-  size(600, 600);
+  size(1366, 768);
 
   font = createFont("Arial", 10);
 
@@ -95,13 +71,16 @@ void setup()
   populateMainTab();
   populateSetupTab();
   populateDebugTab();
-
-
-  maxSetPointValue = 525;
-  actualValue = 250;
-  maxOutputValue = 100;
-  outputValue = 12;
-
+  
+  // Init setup values for debug
+  MaxTankLevel = 5; // [m]
+  TankArea = 5; // [m2]
+  OutputValveCoefficient = 1; // []
+  InitialTankLevel = 2.5; // [m]
+  MaxQi = 13; // [m2/s]
+  SetPointTankLevel = InitialTankLevel;
+  
+  updateSetupTab();
 }
 
 void draw()
@@ -109,15 +88,18 @@ void draw()
   background(220);
     
   port_one.update();
+  
+  CurrentQi = map(readRegs[1], 0, 32767, 0, MaxQi);
 
-  // Displays the image at its actual size at point (0,0)
-  //image(img, 0, 0);
+  // Display the image at its actual size at panel bottom
+  image(img, 0, height - img.height);
 
   // Draw the tank
   fill(150, 200, 255);
-  rect(Tank_originx, Tank_originy, Tank_sizex, Tank_sizey);
+  rect(Tank_originx, height - img.height + Tank_originy, Tank_sizex, Tank_sizey);
 
-  actualValuePixel = map(actualValue, 0, maxSetPointValue, 0, Tank_sizey);
+  actualValuePixel = map(CurrentTankLevel, 0, MaxTankLevel, 0, Tank_sizey);
+  setPointValuePixel = map(SetPointTankLevel, 0, MaxTankLevel, 0, Tank_sizey);
 
   // Assicura che il livello dell'acqua rimanga entro i limiti della vasca
   actualValuePixel = constrain(actualValuePixel, 0, Tank_sizey);
@@ -126,7 +108,7 @@ void draw()
       // Disegna l'acqua nella vasca
       fill(0, 100, 255);
       rect(Tank_originx,
-           Tank_originy + Tank_sizey - actualValuePixel,
+           height - img.height + (Tank_originy + Tank_sizey - actualValuePixel),
            Tank_sizex,
            actualValuePixel);
   }
@@ -138,7 +120,7 @@ void draw()
 
       // Disegna un segno orizzontale
       fill(255, 0, 0);
-      rect(Tank_originx, Tank_originy + Tank_sizey - setPointValuePixel, Tank_sizex, 1);
+      rect(Tank_originx, height - img.height + (Tank_originy + Tank_sizey - setPointValuePixel), Tank_sizex, 1);
   }
     
   noStroke();
@@ -147,19 +129,25 @@ void draw()
   fill(0);
   textFont(font);
   textAlign(CENTER);
-  //text(nf(timeoutEventCounter, 0, 0), width / 2, (height / 3));
+  //text(nf(CurrentTankLevel, 0, 0), width / 2, (height / 3));
 
   // Print counter value
   fill(0);
   textFont(font);
   textAlign(CENTER);
-  //text(nf(communicationFrameCount,0 ,0), width / 2, ((height / 3) * 2));
+  //text(nf(CurrentTankLevel,0 ,0), width / 2, ((height / 3) * 2));
 
   textFont(font);
   textAlign(LEFT);
  //<>//
   updateDebugTab();
   updateMainTab();
+  
+  writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
+  writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
+  
+  
+  CurrentTankLevel+=0.001;
 }
 
 void init_model_image(){
