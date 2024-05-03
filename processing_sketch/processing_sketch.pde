@@ -81,6 +81,10 @@ void setup()
   SetPointTankLevel = InitialTankLevel;
   
   updateSetupTab();
+  
+  AxisFont = loadFont("axis.vlw");
+  TitleFont = loadFont("Titles.vlw");
+  ProfileFont = loadFont("profilestep.vlw");
 }
 
 void draw()
@@ -148,6 +152,17 @@ void draw()
   
   
   CurrentTankLevel+=0.001;
+  
+  Input = CurrentTankLevel;
+  Setpoint = SetPointTankLevel;
+  Output = CurrentQi;
+  OutScaleMax = MaxQi;
+  AdvanceData();
+  madeContact = true;
+  drawGraph();
+  
+  
+  
 }
 
 void init_model_image(){
