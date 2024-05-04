@@ -34,7 +34,7 @@ void createTabs()
 
 
 controlP5.Textfield volf, levelf, qif, quf, setpointf;
-int mainTop = 30, mainLeft = 10, mainW=100, mainH=20, mainLineSpacing = 50, mainFontSize = 12;
+int mainTop = 30, mainLeft = 10, mainW=200, mainH=22, mainLineSpacing = 60, mainFontSize = 20;
 
 
 void populateMainTab()
@@ -77,7 +77,7 @@ controlP5.Button ConnectButton, DisconnectButton;
 controlP5.Textlabel Connecting;
 String[] CommPorts;
 DropdownList r1;
-int commTop = 30, commLeft = 10, commW=160, commH=180, setupLineSpacing = 50, setupFontSize = 12;
+int commTop = 30, commLeft = 10, commW=200, commH=180, setupLineSpacing = 60, setupFontSize = 20;
 controlP5.Textfield maxLevelf, areaf, cf, initLevelf, qimaxf;
 int dashTop = 200, dashLeft = 10, dashW=160, dashH=180; 
 
@@ -153,7 +153,7 @@ void updateSetupTab()
 }
 
 controlP5.Textfield cnf, outf, setpf, measf, p0sf, p1sf;
-int debugTop = 30, debugLeft = 10, debugW=100, debugH=20, debugLineSpacing = 50, debugFontSize = 12;
+int debugTop = 30, debugLeft = 10, debugW=200, debugH=22, debugLineSpacing = 60, debugFontSize = 20;
 
 void populateDebugTab()
 {  

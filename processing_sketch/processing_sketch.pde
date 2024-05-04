@@ -6,6 +6,7 @@
 
 import processing.serial.*;
 import controlP5.*;
+import signal.library.*;
 
 // Serial port communication setup
 Serial myPort;
@@ -34,14 +35,16 @@ float setPointValuePixel, actualValuePixel;
 float Tank_originx, Tank_originy;
 float Tank_sizex, Tank_sizey;
 
-int previousMillis = 0;
-int test;
+
 
 // model parameter
 float MaxTankLevel, TankArea, OutputValveCoefficient, InitialTankLevel, MaxQi;
 
 // runtime model data
 float CurrentTankVolume, CurrentTankLevel, SetPointTankLevel, CurrentQi, CurrentQu;
+int nextModelRefresh = 0;
+float ModelRefreshRate = 0.1;
+SignalFilter QiFilter;
 
 void setup()
 {
@@ -75,10 +78,11 @@ void setup()
   // Init setup values for debug
   MaxTankLevel = 5; // [m]
   TankArea = 5; // [m2]
-  OutputValveCoefficient = 1; // []
+  OutputValveCoefficient = 0.1; // []
   InitialTankLevel = 2.5; // [m]
-  MaxQi = 13; // [m2/s]
+  MaxQi = 3; // [m2/s]
   SetPointTankLevel = InitialTankLevel;
+  init_math_model();
   
   updateSetupTab();
   
@@ -143,14 +147,14 @@ void draw()
 
   textFont(font);
   textAlign(LEFT);
+
+  update_math_model();
  //<>//
   updateDebugTab();
   updateMainTab();
   
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
-  
-  CurrentTankLevel+=0.001;
   
   Input = CurrentTankLevel;
   Setpoint = SetPointTankLevel;
@@ -169,4 +173,33 @@ void init_model_image(){
   Tank_originy = 106;
   Tank_sizex = 206;
   Tank_sizey = 164;
+}
+
+void init_math_model(){
+  CurrentTankVolume = InitialTankLevel * TankArea;
+  QiFilter = new SignalFilter(this);
+  QiFilter.setFrequency(1200);
+}
+
+void update_math_model(){
+int tmp;
+  tmp = millis() - nextModelRefresh;
+  
+  if(tmp > 0)
+  {
+    print("debug: time diff:" + tmp + "\n");
+    nextModelRefresh  = millis()+ int(ModelRefreshRate * 1000);
+
+    // update volume by CurrentQi
+    float filteredCurrentQi = QiFilter.filterUnitFloat( CurrentQi );    
+    CurrentTankVolume += (filteredCurrentQi * ModelRefreshRate);
+    CurrentTankVolume = constrain(CurrentTankVolume, 0, TankArea * MaxTankLevel);
+
+    // update volume by CurrentQu
+    CurrentQu = sqrt(CurrentTankLevel) * OutputValveCoefficient;
+    CurrentTankVolume -= (CurrentQu * ModelRefreshRate);
+    CurrentTankVolume = constrain(CurrentTankVolume, 0, TankArea * MaxTankLevel);
+
+    CurrentTankLevel = CurrentTankVolume / TankArea;
+  }
 }

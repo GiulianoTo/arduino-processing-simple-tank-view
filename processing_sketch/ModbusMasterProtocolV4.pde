@@ -37,7 +37,8 @@ class ModbusPort
      So if you are experiencing packet errors then increase the T1_5
      inter-character time out variable.
    */
-  int T1_5 = 30; // inter character time out in milliseconds
+//  int T1_5 = 30; // inter character time out in milliseconds
+  int T1_5 = 3; // TODO Giuliano capire il corretto valjore per non avere lock nel draw
   int delayStart;
   
   Packet[] packets; 
