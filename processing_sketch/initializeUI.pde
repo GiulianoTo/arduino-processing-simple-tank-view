@@ -33,7 +33,7 @@ void createTabs()
 }
 
 
-controlP5.Textfield volf, levelf, qif, quf;
+controlP5.Textfield volf, levelf, qif, quf, setpointf;
 int mainTop = 30, mainLeft = 10, mainW=100, mainH=20, mainLineSpacing = 50, mainFontSize = 12;
 
 
@@ -57,6 +57,11 @@ void populateMainTab()
   quf = controlP5.addTextfield("qu[m2/s]", mainLeft, mainTop, mainW, mainH);
   quf.moveTo("default"); 
   quf.setFont(createFont("arial",mainFontSize));
+
+  mainTop += mainLineSpacing;
+  setpointf = controlP5.addTextfield("setp[m]", mainLeft, mainTop, mainW, mainH);
+  setpointf.moveTo("default"); 
+  setpointf.setFont(createFont("arial",mainFontSize));
 }
 
 void updateMainTab()
@@ -65,6 +70,7 @@ void updateMainTab()
   levelf.setText(str(CurrentTankLevel));
   qif.setText(str(CurrentQi));
   quf.setText(str(CurrentQu));
+  setpointf.setText(str(SetPointTankLevel));
 }
 
 controlP5.Button ConnectButton, DisconnectButton;

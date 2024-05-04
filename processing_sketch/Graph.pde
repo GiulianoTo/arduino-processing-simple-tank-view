@@ -1,7 +1,7 @@
-int windowSpan = 300000;    // number of mS into the past you want to display
+int windowSpan = 60000;    // number of mS into the past you want to display
 int refreshRate = 100;      // how often you want the graph to be reDrawn;
-int windowWidth = 900;      // set the size of the 
-int windowHeight = 600;     // form
+int windowWidth = 1366;      // set the size of the 
+int windowHeight = 768;     // form
 
 int nextRefresh;
 int arrayLength = windowSpan / refreshRate+1;
@@ -12,7 +12,7 @@ boolean madeContact =false;
 int vertCount = 10;
 int nPoints = 0;
 float Input, Setpoint, Output;
-float ioLeft = 180, ioWidth = windowWidth-ioLeft-50;
+float ioLeft = 450 + 20, ioWidth = windowWidth-ioLeft-50;
 float ioRight = ioLeft+ioWidth;
 float pointWidth= (ioWidth)/float(arrayLength-1);
 

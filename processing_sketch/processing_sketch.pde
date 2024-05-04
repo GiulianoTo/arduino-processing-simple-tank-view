@@ -90,7 +90,6 @@ void setup()
 void draw()
 {
   background(220);
-    
   port_one.update();
   
   CurrentQi = map(readRegs[1], 0, 32767, 0, MaxQi);
@@ -99,6 +98,7 @@ void draw()
   image(img, 0, height - img.height);
 
   // Draw the tank
+  noStroke();
   fill(150, 200, 255);
   rect(Tank_originx, height - img.height + Tank_originy, Tank_sizex, Tank_sizey);
 
@@ -150,23 +150,21 @@ void draw()
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
   
-  
   CurrentTankLevel+=0.001;
   
   Input = CurrentTankLevel;
   Setpoint = SetPointTankLevel;
   Output = CurrentQi;
+  InScaleMax = MaxTankLevel;
   OutScaleMax = MaxQi;
-  AdvanceData();
+  //AdvanceData();
   madeContact = true;
-  drawGraph();
-  
-  
+  drawGraph();  
   
 }
 
 void init_model_image(){
-  img = loadImage("PUMP_IN_THE_INLET.png");
+  img = loadImage("PUMP_IN_THE_INLET_REDUCED.png");
   Tank_originx = 207;
   Tank_originy = 106;
   Tank_sizex = 206;
