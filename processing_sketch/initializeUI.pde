@@ -42,26 +42,40 @@ void populateMainTab()
   volf = controlP5.addTextfield("Volume[m2]", mainLeft, mainTop, mainW, mainH);
   volf.moveTo("default"); 
   volf.setFont(createFont("arial",mainFontSize));
+  //volf.setColorValue(0xffff8800);          //Orange
+  //volf.setColorActive(0xff00ff00);         //Green
+  //volf.setColorBackground(0xff880000);  //Dark Red
+  volf.setColorLabel(0);
   
   mainTop += mainLineSpacing;
   levelf = controlP5.addTextfield("Level[m]", mainLeft, mainTop, mainW, mainH);
   levelf.moveTo("default"); 
   levelf.setFont(createFont("arial",mainFontSize));
-
+  levelf.setColorLabel(0);
+  levelf.setColorBackground(color(255,0,0));
+  levelf.setColorValue(color(255,255,255));
+  
   mainTop += mainLineSpacing;
   qif = controlP5.addTextfield("qi[m2/s]", mainLeft, mainTop, mainW, mainH);
   qif.moveTo("default"); 
   qif.setFont(createFont("arial",mainFontSize));
-
+  qif.setColorLabel(0);
+  qif.setColorBackground(color(0,0,255));
+  qif.setColorValue(color(255,255,255));
+  
   mainTop += mainLineSpacing;
   quf = controlP5.addTextfield("qu[m2/s]", mainLeft, mainTop, mainW, mainH);
   quf.moveTo("default"); 
   quf.setFont(createFont("arial",mainFontSize));
+  quf.setColorLabel(0);
 
   mainTop += mainLineSpacing;
   setpointf = controlP5.addTextfield("setp[m]", mainLeft, mainTop, mainW, mainH);
   setpointf.moveTo("default"); 
   setpointf.setFont(createFont("arial",mainFontSize));
+  setpointf.setColorLabel(0);
+  setpointf.setColorBackground(color(0,255,0));
+  setpointf.setColorValue(color(0,0,0));
 }
 
 void updateMainTab()
@@ -121,26 +135,31 @@ void populateSetupTab()
   maxLevelf = controlP5.addTextfield("MaxLevel[m] ", commLeft, commTop, commW, commH);
   maxLevelf.moveTo("Tab2"); 
   maxLevelf.setFont(createFont("arial",setupFontSize));
+  maxLevelf.setColorLabel(0);
    
   commTop += setupLineSpacing;
   areaf = controlP5.addTextfield("Area[m2] ", commLeft, commTop, commW, commH);
   areaf.moveTo("Tab2"); 
   areaf.setFont(createFont("arial",setupFontSize));
+  areaf.setColorLabel(0);
   
   commTop += setupLineSpacing;
   cf = controlP5.addTextfield("C[?] ", commLeft, commTop, commW, commH);
   cf.moveTo("Tab2"); 
   cf.setFont(createFont("arial",setupFontSize));
+  cf.setColorLabel(0);
   
   commTop += setupLineSpacing;
   initLevelf = controlP5.addTextfield("InitLevel[m] ", commLeft, commTop, commW, commH);
   initLevelf.moveTo("Tab2"); 
   initLevelf.setFont(createFont("arial",setupFontSize));
+  initLevelf.setColorLabel(0);
    
   commTop += setupLineSpacing;
   qimaxf = controlP5.addTextfield("qimax[m2/s] ", commLeft, commTop, commW, commH);
   qimaxf.moveTo("Tab2"); 
   qimaxf.setFont(createFont("arial",setupFontSize)); 
+  qimaxf.setColorLabel(0);
 }
 
 void updateSetupTab()
@@ -160,31 +179,37 @@ void populateDebugTab()
   cnf = controlP5.addTextfield("Counter: ", debugLeft, debugTop, debugW, debugH);
   cnf.moveTo("Tab3"); 
   cnf.setFont(createFont("arial",debugFontSize));
+  cnf.setColorLabel(0);
   
   debugTop += debugLineSpacing;
   outf = controlP5.addTextfield("outout: ", debugLeft, debugTop, debugW, debugH);
   outf.moveTo("Tab3"); 
   outf.setFont(createFont("arial",debugFontSize));
+  outf.setColorLabel(0);
   
   debugTop += debugLineSpacing;
   setpf = controlP5.addTextfield("setpoint: ", debugLeft, debugTop, debugW, debugH);
   setpf.moveTo("Tab3"); 
   setpf.setFont(createFont("arial",debugFontSize));
+  setpf.setColorLabel(0);
   
   debugTop += debugLineSpacing;
   measf = controlP5.addTextfield("measure: ", debugLeft, debugTop, debugW, debugH);
   measf.moveTo("Tab3"); 
   measf.setFont(createFont("arial",debugFontSize));  
+  measf.setColorLabel(0);
 
   debugTop += debugLineSpacing;
-  p0sf = controlP5.addTextfield("pack0successful: ", debugLeft, debugTop, debugW, debugH);
+  p0sf = controlP5.addTextfield("pack0successful:", debugLeft, debugTop, debugW, debugH);
   p0sf.moveTo("Tab3"); 
   p0sf.setFont(createFont("arial",debugFontSize));  
+  p0sf.setColorLabel(0);
 
   debugTop += debugLineSpacing;
-  p1sf = controlP5.addTextfield("pack1successful ", debugLeft, debugTop, debugW, debugH);
+  p1sf = controlP5.addTextfield("pack1successful:", debugLeft, debugTop, debugW, debugH);
   p1sf.moveTo("Tab3"); 
   p1sf.setFont(createFont("arial",debugFontSize));  
+  p1sf.setColorLabel(0);
 }
 
 void updateDebugTab()

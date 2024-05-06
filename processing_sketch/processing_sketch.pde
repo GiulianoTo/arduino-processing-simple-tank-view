@@ -93,7 +93,7 @@ void setup()
 
 void draw()
 {
-  background(220);
+  background(255);
   port_one.update();
   
   CurrentQi = map(readRegs[1], 0, 32767, 0, MaxQi);
@@ -133,21 +133,6 @@ void draw()
     
   noStroke();
 
-  // Print counter value
-  fill(0);
-  textFont(font);
-  textAlign(CENTER);
-  //text(nf(CurrentTankLevel, 0, 0), width / 2, (height / 3));
-
-  // Print counter value
-  fill(0);
-  textFont(font);
-  textAlign(CENTER);
-  //text(nf(CurrentTankLevel,0 ,0), width / 2, ((height / 3) * 2));
-
-  textFont(font);
-  textAlign(LEFT);
-
   update_math_model();
  //<>//
   updateDebugTab();
@@ -155,13 +140,13 @@ void draw()
   
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
-  
+
+  // update and draw graph
   Input = CurrentTankLevel;
   Setpoint = SetPointTankLevel;
   Output = CurrentQi;
   InScaleMax = MaxTankLevel;
   OutScaleMax = MaxQi;
-  //AdvanceData();
   madeContact = true;
   drawGraph();  
   
@@ -200,6 +185,7 @@ int tmp;
     CurrentTankVolume -= (CurrentQu * ModelRefreshRate);
     CurrentTankVolume = constrain(CurrentTankVolume, 0, TankArea * MaxTankLevel);
 
+    // update tank level based on new volume
     CurrentTankLevel = CurrentTankVolume / TankArea;
   }
 }

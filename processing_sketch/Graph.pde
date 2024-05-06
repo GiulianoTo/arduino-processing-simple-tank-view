@@ -64,7 +64,7 @@ void drawGraph()
 
   //Section Titles
   textFont(TitleFont);
-  fill(255);
+  fill(0);
   text("PID Input / Setpoint",(int)ioLeft+10,(int)inputTop-5);
   text("PID Output",(int)ioLeft+10,(int)outputTop-5);
 
