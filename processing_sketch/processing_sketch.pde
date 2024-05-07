@@ -115,6 +115,11 @@ void draw()
   if (actualValuePixel > 0) {
       // Disegna l'acqua nella vasca
       fill(0, 100, 255);
+      if (actualValuePixel > (Tank_sizey - 10))
+        fill(255, 255, 0);       
+      if (actualValuePixel == Tank_sizey)
+        fill(255, 0, 0); 
+       
       rect(Tank_originx,
            height - img.height + (Tank_originy + Tank_sizey - actualValuePixel),
            Tank_sizex,
