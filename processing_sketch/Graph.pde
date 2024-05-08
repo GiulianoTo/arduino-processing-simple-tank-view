@@ -1,7 +1,7 @@
 int windowSpan = 60000;    // number of mS into the past you want to display
 int refreshRate = 100;      // how often you want the graph to be reDrawn;
-int windowWidth = 1366;      // set the size of the 
-int windowHeight = 768;     // form
+int windowWidth = ScreenWidth;      // set the size of the 
+int windowHeight = ScreenHeight;     // form
 
 int nextRefresh;
 int arrayLength = windowSpan / refreshRate+1;

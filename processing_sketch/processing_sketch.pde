@@ -8,6 +8,10 @@ import processing.serial.*;
 import controlP5.*;
 import signal.library.*;
 
+// Screen size
+final int ScreenWidth = 1366;
+final int ScreenHeight = 700;
+
 // Serial port communication setup
 Serial myPort;
 String commPort = "COM3";
@@ -46,9 +50,12 @@ int nextModelRefresh = 0;
 float ModelRefreshRate = 0.1;
 SignalFilter QiFilter;
 
+void settings() {
+  size(ScreenWidth, ScreenHeight);
+}
+
 void setup()
 {
-  size(1366, 768);
 
   font = createFont("Arial", 10);
 
