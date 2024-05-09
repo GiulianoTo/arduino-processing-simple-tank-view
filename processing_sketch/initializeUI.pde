@@ -1,5 +1,6 @@
 controlP5.Tab mainTab;
 boolean  needToUpdateSetupTab;
+boolean  needToUpdateSetpoint;
 
 
 void createTabs()
@@ -77,6 +78,7 @@ void populateMainTab()
   setpointf.setColorLabel(0);
   setpointf.setColorBackground(color(0,255,0));
   setpointf.setColorValue(color(0,0,0));
+  setpointf.setAutoClear(false);
 }
 
 void updateMainTab()
@@ -85,7 +87,10 @@ void updateMainTab()
   levelf.setText(str(CurrentTankLevel));
   qif.setText(str(CurrentQi));
   quf.setText(str(CurrentQu));
-  setpointf.setText(str(SetPointTankLevel));
+  if (needToUpdateSetpoint) {
+    setpointf.setText(str(SetPointTankLevel));
+    needToUpdateSetpoint = false;
+  }
 }
 
 controlP5.Button ConnectButton, DisconnectButton;
@@ -235,6 +240,8 @@ void controlEvent(ControlEvent theEvent) {
   if(theEvent.isAssignableFrom(Textfield.class)) OutputValveCoefficient = float(controlP5.get(Textfield.class,"C[?] ").getText());
   if(theEvent.isAssignableFrom(Textfield.class)) InitialTankLevel = float(controlP5.get(Textfield.class,"InitLevel[m] ").getText());
   if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m2/s] ").getText()); 
+  if(theEvent.isAssignableFrom(Textfield.class)) SetPointTankLevel = float(controlP5.get(Textfield.class,"setp[m]").getText()); 
 
   needToUpdateSetupTab = true;
+  needToUpdateSetpoint = true;
 }

@@ -92,6 +92,7 @@ void setup()
   init_math_model();
   
   needToUpdateSetupTab = true;
+  needToUpdateSetpoint = true;
   
   AxisFont = loadFont("axis.vlw");
   TitleFont = loadFont("Titles.vlw");
@@ -124,7 +125,7 @@ void draw()
       fill(0, 100, 255);
       if (actualValuePixel > (Tank_sizey - 10))
         fill(255, 255, 0);       
-      if (actualValuePixel == Tank_sizey)
+      if (actualValuePixel > (Tank_sizey - 2))
         fill(255, 0, 0); 
        
       rect(Tank_originx,
