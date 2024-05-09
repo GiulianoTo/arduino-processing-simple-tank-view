@@ -1,4 +1,5 @@
 controlP5.Tab mainTab;
+boolean  needToUpdateSetupTab;
 
 
 void createTabs()
@@ -136,30 +137,35 @@ void populateSetupTab()
   maxLevelf.moveTo("Tab2"); 
   maxLevelf.setFont(createFont("arial",setupFontSize));
   maxLevelf.setColorLabel(0);
+  maxLevelf.setAutoClear(false);
    
   commTop += setupLineSpacing;
   areaf = controlP5.addTextfield("Area[m2] ", commLeft, commTop, commW, commH);
   areaf.moveTo("Tab2"); 
   areaf.setFont(createFont("arial",setupFontSize));
   areaf.setColorLabel(0);
+  areaf.setAutoClear(false);
   
   commTop += setupLineSpacing;
   cf = controlP5.addTextfield("C[?] ", commLeft, commTop, commW, commH);
   cf.moveTo("Tab2"); 
   cf.setFont(createFont("arial",setupFontSize));
   cf.setColorLabel(0);
+  cf.setAutoClear(false);
   
   commTop += setupLineSpacing;
   initLevelf = controlP5.addTextfield("InitLevel[m] ", commLeft, commTop, commW, commH);
   initLevelf.moveTo("Tab2"); 
   initLevelf.setFont(createFont("arial",setupFontSize));
   initLevelf.setColorLabel(0);
+  initLevelf.setAutoClear(false);
    
   commTop += setupLineSpacing;
   qimaxf = controlP5.addTextfield("qimax[m2/s] ", commLeft, commTop, commW, commH);
   qimaxf.moveTo("Tab2"); 
   qimaxf.setFont(createFont("arial",setupFontSize)); 
   qimaxf.setColorLabel(0);
+  qimaxf.setAutoClear(false);
 }
 
 void updateSetupTab()
@@ -220,4 +226,15 @@ void updateDebugTab()
   measf.setText(str(writeRegs[1]));
   p0sf.setText(str(packets[0].successful_requests));
   p1sf.setText(str(packets[1].successful_requests));
+}
+
+void controlEvent(ControlEvent theEvent) {
+
+  if(theEvent.isAssignableFrom(Textfield.class)) MaxTankLevel = float(controlP5.get(Textfield.class,"MaxLevel[m] ").getText());
+  if(theEvent.isAssignableFrom(Textfield.class)) TankArea = float(controlP5.get(Textfield.class,"Area[m2] ").getText());
+  if(theEvent.isAssignableFrom(Textfield.class)) OutputValveCoefficient = float(controlP5.get(Textfield.class,"C[?] ").getText());
+  if(theEvent.isAssignableFrom(Textfield.class)) InitialTankLevel = float(controlP5.get(Textfield.class,"InitLevel[m] ").getText());
+  if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m2/s] ").getText()); 
+
+  needToUpdateSetupTab = true;
 }

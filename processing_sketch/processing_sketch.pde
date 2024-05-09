@@ -86,12 +86,12 @@ void setup()
   MaxTankLevel = 5; // [m]
   TankArea = 5; // [m2]
   OutputValveCoefficient = 0.1; // []
-  InitialTankLevel = 2.5; // [m]
+  InitialTankLevel = MaxTankLevel/2; // [m]
   MaxQi = 3; // [m2/s]
-  SetPointTankLevel = InitialTankLevel;
+  SetPointTankLevel = MaxTankLevel/2;
   init_math_model();
   
-  updateSetupTab();
+  needToUpdateSetupTab = true;
   
   AxisFont = loadFont("axis.vlw");
   TitleFont = loadFont("Titles.vlw");
@@ -149,6 +149,10 @@ void draw()
  //<>//
   updateDebugTab();
   updateMainTab();
+  if (needToUpdateSetupTab) {
+    updateSetupTab();
+    needToUpdateSetupTab = false;
+    }
   
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
@@ -184,7 +188,7 @@ int tmp;
   
   if(tmp > 0)
   {
-    print("debug: time diff:" + tmp + "\n");
+    //print("debug: time diff:" + tmp + "\n");
     nextModelRefresh  = millis()+ int(ModelRefreshRate * 1000);
 
     // update volume by CurrentQi
