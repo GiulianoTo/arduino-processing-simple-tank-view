@@ -16,13 +16,7 @@ const long interval = 100;
 
 int regulator(int measure, int setpoint, float interval)
 {
-  int error = measure - setpoint;
-  if (error > 1000)
-    output = 0;
-  if (error < -1000)
-    output = 10000;
-
-    return output;
+    return 0;
 }
 
 void setup()
