@@ -14,7 +14,7 @@ final int ScreenHeight = 700;
 
 // Serial port communication setup
 Serial myPort;
-String commPort = "COM3";
+String commPort = "COM4";
 int baud = 115200;
 char parity = 'N';
 int dataBits = 8;
