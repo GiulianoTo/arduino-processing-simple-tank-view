@@ -1,6 +1,6 @@
 controlP5.Tab mainTab;
 boolean  needToUpdateSetupTab;
-boolean  needToUpdateSetpoint;
+boolean  needToUpdateSetpoint, needToUpdateParameters;
 
 
 void createTabs()
@@ -35,8 +35,8 @@ void createTabs()
 }
 
 
-controlP5.Textfield volf, levelf, qif, quf, setpointf;
-int mainTop = 30, mainLeft = 10, mainW=200, mainH=22, mainLineSpacing = 60, mainFontSize = 20;
+controlP5.Textfield volf, levelf, qif, quf, setpointf, parA, parB, parC, parD;
+int mainTop = 30, mainLeft = 10, mainW=200, mainH=22, mainLineSpacing = 60, mainFontSize = 20, secondleft = 220;
 
 
 void populateMainTab()
@@ -79,6 +79,31 @@ void populateMainTab()
   setpointf.setColorBackground(color(0,255,0));
   setpointf.setColorValue(color(0,0,0));
   setpointf.setAutoClear(false);
+  
+  mainTop = 30;
+  parA = controlP5.addTextfield("PAR_A", secondleft, mainTop, mainW, mainH);
+  parA.moveTo("default"); 
+  parA.setFont(createFont("arial",mainFontSize));
+  parA.setColorLabel(0);
+  
+  mainTop += mainLineSpacing;
+  parB = controlP5.addTextfield("PAR_B", secondleft, mainTop, mainW, mainH);
+  parB.moveTo("default"); 
+  parB.setFont(createFont("arial",mainFontSize));
+  parB.setColorLabel(0);
+  
+  mainTop += mainLineSpacing;
+  parC = controlP5.addTextfield("PAR_C", secondleft, mainTop, mainW, mainH);
+  parC.moveTo("default"); 
+  parC.setFont(createFont("arial",mainFontSize));
+  parC.setColorLabel(0);
+    
+  mainTop += mainLineSpacing;
+  parD = controlP5.addTextfield("PAR_D", secondleft, mainTop, mainW, mainH);
+  parD.moveTo("default"); 
+  parD.setFont(createFont("arial",mainFontSize));
+  parD.setColorLabel(0); 
+  
 }
 
 void updateMainTab()
@@ -87,10 +112,20 @@ void updateMainTab()
   levelf.setText(str(CurrentTankLevel));
   qif.setText(str(CurrentQi));
   quf.setText(str(CurrentQu));
+  
   if (needToUpdateSetpoint) {
     setpointf.setText(str(SetPointTankLevel));
     needToUpdateSetpoint = false;
   }
+  
+  if (needToUpdateParameters) {
+    parA.setText(str(parameterA));
+    parB.setText(str(parameterB));
+    parC.setText(str(parameterC));
+    parD.setText(str(parameterD));
+    needToUpdateParameters = false;
+  }  
+  
 }
 
 controlP5.Button ConnectButton, DisconnectButton;
@@ -242,6 +277,12 @@ void controlEvent(ControlEvent theEvent) {
   if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m3/s] ").getText()); 
   if(theEvent.isAssignableFrom(Textfield.class)) SetPointTankLevel = float(controlP5.get(Textfield.class,"setp[m]").getText()); 
 
+  if(theEvent.isAssignableFrom(Textfield.class)) parameterA = float(controlP5.get(Textfield.class,"PAR_A").getText()); 
+  if(theEvent.isAssignableFrom(Textfield.class)) parameterB = float(controlP5.get(Textfield.class,"PAR_B").getText()); 
+  if(theEvent.isAssignableFrom(Textfield.class)) parameterC = float(controlP5.get(Textfield.class,"PAR_C").getText()); 
+  if(theEvent.isAssignableFrom(Textfield.class)) parameterD = float(controlP5.get(Textfield.class,"PAR_D").getText()); 
+
   needToUpdateSetupTab = true;
   needToUpdateSetpoint = true;
+  needToUpdateParameters = true;
 }

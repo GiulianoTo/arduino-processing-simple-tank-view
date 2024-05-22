@@ -28,7 +28,7 @@ int no_of_retries = 10;
 int total_no_of_packets = 2;
 Packet[] packets = new Packet[total_no_of_packets];
 int[] readRegs = new int[2]; // store data read from Arduino
-int[] writeRegs = new int[2]; // store data write for Arduino
+int[] writeRegs = new int[6]; // store data write for Arduino
 
 // UI setup
 ControlP5 controlP5;
@@ -38,6 +38,7 @@ PFont font;
 float setPointValuePixel, actualValuePixel;
 float Tank_originx, Tank_originy;
 float Tank_sizex, Tank_sizey;
+float parameterA, parameterB, parameterC, parameterD; 
 
 
 
@@ -68,8 +69,8 @@ void setup()
   port_one = new ModbusPort(myPort, timeout, polling, no_of_retries, packets, total_no_of_packets); 
  
   // init modbus packets
-  packets[0] = new Packet(1, port_one.READ_HOLDING_REGISTERS,2, 2, readRegs); 
-  packets[1] = new Packet(1, port_one.PRESET_MULTIPLE_REGISTERS,0, 2, writeRegs); 
+  packets[0] = new Packet(1, port_one.READ_HOLDING_REGISTERS,6, 2, readRegs); 
+  packets[1] = new Packet(1, port_one.PRESET_MULTIPLE_REGISTERS,0, 6, writeRegs); 
   
   frameRate(500);
   
@@ -157,6 +158,10 @@ void draw()
   
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
+  writeRegs[2] = int(constrain(parameterA * 100, 0, 32767));
+  writeRegs[3] = int(constrain(parameterB * 100, 0, 32767));
+  writeRegs[4] = int(constrain(parameterC * 100, 0, 32767));
+  writeRegs[5] = int(constrain(parameterD * 100, 0, 32767));
 
   // update and draw graph
   Input = CurrentTankLevel;
