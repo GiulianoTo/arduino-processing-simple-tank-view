@@ -4,42 +4,37 @@
   by Giuliano Tognon
 */
 
-#include <ArduinoRS485.h>
-#include <ArduinoModbus.h>
+#include <ModbusRTUSlave.h>
+
+ModbusRTUSlave modbus(Serial);
+
+uint16_t holdingRegisters[4];
 
 int setpoint, measure;
 int freerunningCounter, output;
-int test;
 
 unsigned long previousMillis = 0;
 const long interval = 100;
 
 int regulator(int measure, int setpoint, float interval)
 {
-    return 0;
+    return 1000;
 }
 
 void setup()
 {
-    // start the Modbus RTU server, with (slave) id 1
-    if (!ModbusRTUServer.begin(1, 115200)) {
-        while (1) {}
-    }
-
-    // configure four holding registers at address 0x00
-    ModbusRTUServer.configureHoldingRegisters(0x00, 4);
+  modbus.configureHoldingRegisters(holdingRegisters, 4);
+  modbus.begin(1, 115200);
 }
 
 void loop()
 {
     // poll for Modbus RTU requests
-    int packetReceived = ModbusRTUServer.poll();
+    modbus.poll();
 
-    if (packetReceived) {
-        // read the current value of the wrote holding registers
-        setpoint = ModbusRTUServer.holdingRegisterRead(0x00);
-        measure = ModbusRTUServer.holdingRegisterRead(0x01);
-    }
+    // read the current value of the wrote holding registers
+    setpoint = holdingRegisters[0];
+    measure = holdingRegisters[1];
 
     // check to see if it's time to execute regulator()
     unsigned long currentMillis = millis();
@@ -49,6 +44,7 @@ void loop()
         output = regulator(measure, setpoint, (interval/1000.0));
     }
 
-    ModbusRTUServer.holdingRegisterWrite(0x02, freerunningCounter++);
-    ModbusRTUServer.holdingRegisterWrite(0x03, output);
+    // update the value of the readable holding registers
+    holdingRegisters[2] = freerunningCounter++;
+    holdingRegisters[3] = output;
 }
