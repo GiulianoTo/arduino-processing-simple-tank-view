@@ -41,7 +41,7 @@ int mainTop = 30, mainLeft = 10, mainW=200, mainH=22, mainLineSpacing = 60, main
 
 void populateMainTab()
 {
-  volf = controlP5.addTextfield("Volume[m2]", mainLeft, mainTop, mainW, mainH);
+  volf = controlP5.addTextfield("Volume[m3]", mainLeft, mainTop, mainW, mainH);
   volf.moveTo("default"); 
   volf.setFont(createFont("arial",mainFontSize));
   //volf.setColorValue(0xffff8800);          //Orange
@@ -58,7 +58,7 @@ void populateMainTab()
   levelf.setColorValue(color(255,255,255));
   
   mainTop += mainLineSpacing;
-  qif = controlP5.addTextfield("qi[m2/s]", mainLeft, mainTop, mainW, mainH);
+  qif = controlP5.addTextfield("qi[m3/s]", mainLeft, mainTop, mainW, mainH);
   qif.moveTo("default"); 
   qif.setFont(createFont("arial",mainFontSize));
   qif.setColorLabel(0);
@@ -66,7 +66,7 @@ void populateMainTab()
   qif.setColorValue(color(255,255,255));
   
   mainTop += mainLineSpacing;
-  quf = controlP5.addTextfield("qu[m2/s]", mainLeft, mainTop, mainW, mainH);
+  quf = controlP5.addTextfield("qu[m3/s]", mainLeft, mainTop, mainW, mainH);
   quf.moveTo("default"); 
   quf.setFont(createFont("arial",mainFontSize));
   quf.setColorLabel(0);
@@ -166,7 +166,7 @@ void populateSetupTab()
   initLevelf.setAutoClear(false);
    
   commTop += setupLineSpacing;
-  qimaxf = controlP5.addTextfield("qimax[m2/s] ", commLeft, commTop, commW, commH);
+  qimaxf = controlP5.addTextfield("qimax[m3/s] ", commLeft, commTop, commW, commH);
   qimaxf.moveTo("Tab2"); 
   qimaxf.setFont(createFont("arial",setupFontSize)); 
   qimaxf.setColorLabel(0);
@@ -193,7 +193,7 @@ void populateDebugTab()
   cnf.setColorLabel(0);
   
   debugTop += debugLineSpacing;
-  outf = controlP5.addTextfield("outout: ", debugLeft, debugTop, debugW, debugH);
+  outf = controlP5.addTextfield("output: ", debugLeft, debugTop, debugW, debugH);
   outf.moveTo("Tab3"); 
   outf.setFont(createFont("arial",debugFontSize));
   outf.setColorLabel(0);
@@ -239,7 +239,7 @@ void controlEvent(ControlEvent theEvent) {
   if(theEvent.isAssignableFrom(Textfield.class)) TankArea = float(controlP5.get(Textfield.class,"Area[m2] ").getText());
   if(theEvent.isAssignableFrom(Textfield.class)) OutputValveCoefficient = float(controlP5.get(Textfield.class,"C[?] ").getText());
   if(theEvent.isAssignableFrom(Textfield.class)) InitialTankLevel = float(controlP5.get(Textfield.class,"InitLevel[m] ").getText());
-  if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m2/s] ").getText()); 
+  if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m3/s] ").getText()); 
   if(theEvent.isAssignableFrom(Textfield.class)) SetPointTankLevel = float(controlP5.get(Textfield.class,"setp[m]").getText()); 
 
   needToUpdateSetupTab = true;
