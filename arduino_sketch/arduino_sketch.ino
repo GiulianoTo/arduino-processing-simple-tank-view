@@ -19,7 +19,7 @@ unsigned long previousMillis = 0;
 const long interval = 100;
 
 int regulator(int measure, int setpoint, float interval, float pa, float pb, float pc, float pd) {
-  int error = measure - setpoint;
+  int error = setpoint - measure;
   long temp;
   float ki;
 
@@ -44,7 +44,7 @@ int regulator(int measure, int setpoint, float interval, float pa, float pb, flo
     // simple pi
     case 3:
       // proportional
-      outp = error * pb * (-1);
+      outp = error * pb;
 
       // integral
       if (pc > 0)
@@ -53,7 +53,7 @@ int regulator(int measure, int setpoint, float interval, float pa, float pb, flo
         ki = 0;
         outi = 0;
       }
-      outi = outi + ki * error * interval * (-1);
+      outi = outi + ki * error * interval;
 
       temp = outp + outi;
       output = constrain(temp, 0, 32767);
