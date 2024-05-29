@@ -13,11 +13,13 @@ uint16_t holdingRegisters[8];
 int setpoint, measure;
 int freerunningCounter, output;
 float parameterA, parameterB, parameterC, parameterD;
-long outp, outi, outd;
+long outp, outi, outd, delta_err;
 
 unsigned long previousMillis = 0;
 const long interval = 100;
 int prev_error = 0;
+int derivative_desample = 3, derivative_desample_counter;  // pid samples to calculate delta error
+
 
 int regulator(int measure, int setpoint, float interval, float pa, float pb, float pc, float pd) {
   int error = setpoint - measure;
@@ -57,9 +59,15 @@ int regulator(int measure, int setpoint, float interval, float pa, float pb, flo
       outi = outi + ki * error * interval;
 
       // derivative
-      int diff = error - prev_error;
-      outd = pd * (diff / interval);
-      prev_error = error;  // update prev_error
+      if (!derivative_desample_counter) {
+        delta_err = error - prev_error;
+        outd = pd * (delta_err / interval * derivative_desample);
+        prev_error = error;  // update prev_error
+        if (derivative_desample)
+          derivative_desample_counter = derivative_desample;
+      } else {
+        derivative_desample_counter--;
+      }
 
       temp = outp + outi + outd;
       output = constrain(temp, 0, 32767);
