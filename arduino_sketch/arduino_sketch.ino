@@ -13,10 +13,11 @@ uint16_t holdingRegisters[8];
 int setpoint, measure;
 int freerunningCounter, output;
 float parameterA, parameterB, parameterC, parameterD;
-long outp, outi;
+long outp, outi, outd;
 
 unsigned long previousMillis = 0;
 const long interval = 100;
+int prev_error = 0;
 
 int regulator(int measure, int setpoint, float interval, float pa, float pb, float pc, float pd) {
   int error = setpoint - measure;
@@ -55,7 +56,12 @@ int regulator(int measure, int setpoint, float interval, float pa, float pb, flo
       }
       outi = outi + ki * error * interval;
 
-      temp = outp + outi;
+      // derivative
+      int diff = error - prev_error;
+      outd = pd * (diff / interval);
+      prev_error = error;  // update prev_error
+
+      temp = outp + outi + outd;
       output = constrain(temp, 0, 32767);
       break;
 
