@@ -139,6 +139,9 @@ int regulator(int measure, int setpoint, float interval, int pa, float pb, float
  * Setup function - Initialize Modbus communication
  */
 void setup() {
+
+  Serial.begin(115200);
+
   // Configure 8 holding registers for Modbus
   modbus.configureHoldingRegisters(holdingRegisters, 8);
   
