@@ -12,7 +12,8 @@ uint16_t holdingRegisters[8];
 
 int setpoint, measure;
 int freerunningCounter, output;
-float parameterA, parameterB, parameterC, parameterD;
+int parameterA;
+float parameterB, parameterC, parameterD;
 long outp, outi, outd, delta_err;
 
 unsigned long previousMillis = 0;
@@ -21,16 +22,16 @@ int prev_error = 0;
 int derivative_desample = 3, derivative_desample_counter;  // pid samples to calculate delta error
 
 
-int regulator(int measure, int setpoint, float interval, float pa, float pb, float pc, float pd) {
+int regulator(int measure, int setpoint, float interval, int pa, float pb, float pc, float pd) {
   int error = setpoint - measure;
   long temp;
   float ki;
 
-  switch ((int)pa) {
+  switch (pa) {
 
     // simple on off
     case 1:
-      if (error >= 0)
+      if (error <= 0)
         output = 0;
       else
         output = 10000;
@@ -38,9 +39,9 @@ int regulator(int measure, int setpoint, float interval, float pa, float pb, flo
 
     // simple on off with hysteresis
     case 2:
-      if (error > (pb * 100))
-        output = 0;
       if (error < -(pb * 100))
+        output = 0;
+      if (error > (pb * 100))
         output = 10000;
       break;
 
@@ -92,7 +93,7 @@ void loop() {
   // read the current value of the wrote holding registers
   setpoint = holdingRegisters[0];
   measure = holdingRegisters[1];
-  parameterA = holdingRegisters[2] / 100.0;
+  parameterA = holdingRegisters[2];
   parameterB = holdingRegisters[3] / 100.0;
   parameterC = holdingRegisters[4] / 100.0;
   parameterD = holdingRegisters[5] / 100.0;
