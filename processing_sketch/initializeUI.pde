@@ -35,7 +35,9 @@ void createTabs()
 }
 
 
-controlP5.Textfield volf, levelf, qif, quf, setpointf, parA, parB, parC, parD;
+controlP5.Textfield volf, levelf, qif, quf, setpointf, parB, parC, parD;
+controlP5.DropdownList parA;
+controlP5.Textlabel parALabel;
 int mainTop = 30, mainLeft = 10, mainW=200, mainH=22, mainLineSpacing = 60, mainFontSize = 20, secondleft = 220;
 
 
@@ -81,10 +83,31 @@ void populateMainTab()
   setpointf.setAutoClear(false);
   
   mainTop = 30;
-  parA = controlP5.addTextfield("PAR_A", secondleft, mainTop, mainW, mainH);
-  parA.moveTo("default"); 
-  parA.setFont(createFont("arial",mainFontSize));
+  parA = controlP5.addDropdownList("PAR_A");
+  parA.setPosition(secondleft, mainTop);
+  parA.setSize(mainW, 120);
+  parA.setBarHeight(mainH);
+  parA.setItemHeight(mainH);
+  parA.addItem("0: off", 0);
+  parA.addItem("1: on-off", 1);
+  parA.addItem("2: on-off hy", 2);
+  parA.addItem("3: pi", 3);
   parA.setColorLabel(0);
+  parA.setColorValue(color(255, 255, 255));
+  parA.setColorValueLabel(color(255, 255, 255));
+  parA.setColorForeground(color(100, 100, 100));
+  parA.setColorActive(color(150, 150, 150));
+  parA.getCaptionLabel().setColor(color(255, 255, 255));
+  parA.getCaptionLabel().getStyle().setPaddingTop(3);
+  parA.getValueLabel().setColor(color(255, 255, 255));
+  parA.getValueLabel().getStyle().setPaddingTop(3);
+  parA.setFont(createFont("arial", mainFontSize));
+  parA.moveTo("default");
+  
+  parALabel = controlP5.addTextlabel("parALabel", "PAR_A", secondleft, mainTop + mainH + 2);
+  parALabel.setFont(createFont("arial", mainFontSize));
+  parALabel.setColor(0);
+  parALabel.moveTo("default");
   
   mainTop += mainLineSpacing;
   parB = controlP5.addTextfield("PAR_B", secondleft, mainTop, mainW, mainH);
@@ -119,7 +142,7 @@ void updateMainTab()
   }
   
   if (needToUpdateParameters) {
-    parA.setText(str(parameterA));
+    parA.setValue(parameterA);
     parB.setText(str(parameterB));
     parC.setText(str(parameterC));
     parD.setText(str(parameterD));
@@ -217,7 +240,7 @@ void updateSetupTab()
   qimaxf.setText(str(MaxQi));
 }
 
-controlP5.Textfield cnf, outf, setpf, measf, p0sf, p1sf;
+controlP5.Textfield cnf, outf, setpf, measf, p0sf, p1sf, parAdbg, parBdbg, parCdbg, parDdbg;
 int debugTop = 30, debugLeft = 10, debugW=200, debugH=22, debugLineSpacing = 60, debugFontSize = 20;
 
 void populateDebugTab()
@@ -256,6 +279,32 @@ void populateDebugTab()
   p1sf.moveTo("Tab3"); 
   p1sf.setFont(createFont("arial",debugFontSize));  
   p1sf.setColorLabel(0);
+  
+  // Parametri inviati (seconda colonna)
+  int debugCol2 = debugLeft + debugW + 20;
+  debugTop = 30;
+  parAdbg = controlP5.addTextfield("PAR_A sent:", debugCol2, debugTop, debugW, debugH);
+  parAdbg.moveTo("Tab3"); 
+  parAdbg.setFont(createFont("arial",debugFontSize));  
+  parAdbg.setColorLabel(0);
+  
+  debugTop += debugLineSpacing;
+  parBdbg = controlP5.addTextfield("PAR_B sent:", debugCol2, debugTop, debugW, debugH);
+  parBdbg.moveTo("Tab3"); 
+  parBdbg.setFont(createFont("arial",debugFontSize));  
+  parBdbg.setColorLabel(0);
+  
+  debugTop += debugLineSpacing;
+  parCdbg = controlP5.addTextfield("PAR_C sent:", debugCol2, debugTop, debugW, debugH);
+  parCdbg.moveTo("Tab3"); 
+  parCdbg.setFont(createFont("arial",debugFontSize));  
+  parCdbg.setColorLabel(0);
+  
+  debugTop += debugLineSpacing;
+  parDdbg = controlP5.addTextfield("PAR_D sent:", debugCol2, debugTop, debugW, debugH);
+  parDdbg.moveTo("Tab3"); 
+  parDdbg.setFont(createFont("arial",debugFontSize));  
+  parDdbg.setColorLabel(0);
 }
 
 void updateDebugTab()
@@ -266,6 +315,12 @@ void updateDebugTab()
   measf.setText(str(writeRegs[1]));
   p0sf.setText(str(packets[0].successful_requests));
   p1sf.setText(str(packets[1].successful_requests));
+  
+  // Visualizza i parametri inviati
+  parAdbg.setText(str(writeRegs[2]));
+  parBdbg.setText(str(writeRegs[3]));
+  parCdbg.setText(str(writeRegs[4]));
+  parDdbg.setText(str(writeRegs[5]));
 }
 
 void controlEvent(ControlEvent theEvent) {
@@ -277,7 +332,7 @@ void controlEvent(ControlEvent theEvent) {
   if(theEvent.isAssignableFrom(Textfield.class)) MaxQi = float(controlP5.get(Textfield.class,"qimax[m3/s] ").getText()); 
   if(theEvent.isAssignableFrom(Textfield.class)) SetPointTankLevel = float(controlP5.get(Textfield.class,"setp[m]").getText()); 
 
-  if(theEvent.isAssignableFrom(Textfield.class)) parameterA = float(controlP5.get(Textfield.class,"PAR_A").getText()); 
+  if(theEvent.isFrom(parA)) parameterA = int(theEvent.getValue());
   if(theEvent.isAssignableFrom(Textfield.class)) parameterB = float(controlP5.get(Textfield.class,"PAR_B").getText()); 
   if(theEvent.isAssignableFrom(Textfield.class)) parameterC = float(controlP5.get(Textfield.class,"PAR_C").getText()); 
   if(theEvent.isAssignableFrom(Textfield.class)) parameterD = float(controlP5.get(Textfield.class,"PAR_D").getText()); 
