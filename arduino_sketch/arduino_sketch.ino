@@ -64,75 +64,8 @@ const long interval = 100;         // Regulation update interval [ms]
 
 
 int regulator(int measure, int setpoint, float interval, int pa, float pb, float pc, float pd) {
-  int error = setpoint - measure;
-  long temp;
-  float ki;
-
-  switch (pa) {
-    
-    // Mode 0: OFF - No regulation
-    case 0:
-      output = 0;
-      outi = 0;
-      break;
-
-    // Mode 1: Simple ON-OFF controller
-    case 1:
-      if (error <= 0)
-        output = 0;
-      else
-        output = 10000;
-      break;
-
-    // Mode 2: ON-OFF with hysteresis
-    // pb parameter defines the hysteresis band
-    case 2:
-      if (error < -(pb * 100))
-        output = 0;
-      if (error > (pb * 100))
-        output = 10000;
-      break;
-
-    // Mode 3: PI/PID controller
-    // pb = Proportional gain (Kp)
-    // pc = Integral time constant (Ti)
-    // pd = Derivative gain (Kd)
-    case 3:
-      // Proportional term
-      outp = error * pb;
-
-      // Integral term
-      if (pc > 0)
-        ki = 1 / (pc);
-      else {
-        ki = 0;
-        outi = 0;      // Reset integral when Ti = 0
-      }
-      outi = outi + ki * error * interval;
-
-      // Derivative term (with downsampling)
-      if (!derivative_desample_counter) {
-        delta_err = error - prev_error;
-        outd = pd * (delta_err / interval * derivative_desample);
-        prev_error = error;
-        if (derivative_desample)
-          derivative_desample_counter = derivative_desample;
-      } else {
-        derivative_desample_counter--;
-      }
-
-      // Calculate total output and constrain to valid range
-      temp = outp + outi + outd;
-      output = constrain(temp, 0, 32767);
-      break;
-
-    // Default: output OFF
-    default:
-      output = 0;
-      outi = 0;
-  }
-  
-  return output;
+ 
+  return 0;
 }
 
 /**
