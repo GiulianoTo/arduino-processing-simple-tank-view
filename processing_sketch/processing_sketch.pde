@@ -38,7 +38,8 @@ PFont font;
 float setPointValuePixel, actualValuePixel;
 float Tank_originx, Tank_originy;
 float Tank_sizex, Tank_sizey;
-float parameterA, parameterB, parameterC, parameterD; 
+int parameterA;
+float parameterB, parameterC, parameterD; 
 
 
 
@@ -158,10 +159,27 @@ void draw()
   
   writeRegs[0] = int(map(SetPointTankLevel, 0, MaxTankLevel, 0, 32767));
   writeRegs[1] = int(map(CurrentTankLevel, 0, MaxTankLevel, 0, 32767));
-  writeRegs[2] = int(constrain(parameterA * 100, 0, 32767));
+  writeRegs[2] = parameterA;
   writeRegs[3] = int(constrain(parameterB * 100, 0, 32767));
   writeRegs[4] = int(constrain(parameterC * 100, 0, 32767));
   writeRegs[5] = int(constrain(parameterD * 100, 0, 32767));
+  
+  // Debug: stampa i valori inviati via Modbus ogni 100 frame
+  if (frameCount % 100 == 0) {
+    println("=== MODBUS DATA ===" );
+    println("READ from Arduino:");
+    println("  readRegs[0] (counter): " + readRegs[0]);
+    println("  readRegs[1] (output): " + readRegs[1]);
+    println("WRITE to Arduino:");
+    println("  writeRegs[0] (setpoint): " + writeRegs[0]);
+    println("  writeRegs[1] (measure): " + writeRegs[1]);
+    println("  writeRegs[2] (PAR_A): " + writeRegs[2] + " (" + parameterA + ")");
+    println("  writeRegs[3] (PAR_B): " + writeRegs[3] + " (" + parameterB + ")");
+    println("  writeRegs[4] (PAR_C): " + writeRegs[4] + " (" + parameterC + ")");
+    println("  writeRegs[5] (PAR_D): " + writeRegs[5] + " (" + parameterD + ")");
+    println("Packets successful: [0]=" + packets[0].successful_requests + " [1]=" + packets[1].successful_requests);
+    println("");
+  }
 
   // update and draw graph
   Input = CurrentTankLevel;
