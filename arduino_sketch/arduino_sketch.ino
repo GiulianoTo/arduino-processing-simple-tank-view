@@ -109,6 +109,8 @@ int regulator(int measure, int setpoint, float interval, int pa, float pb, float
         outi = 0;      // Reset integral when Ti = 0
       }
       outi = outi + ki * error * interval;
+      // Anti-reset windup: clamp integral so that total output stays within [0, 32767]
+      outi = constrain(outi, (long)(0 - outp - outd), (long)(32767 - outp - outd));
 
       // Derivative term (with downsampling)
       if (!derivative_desample_counter) {
