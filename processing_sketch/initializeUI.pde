@@ -338,6 +338,6 @@ void controlEvent(ControlEvent theEvent) {
   if(theEvent.isAssignableFrom(Textfield.class)) parameterD = float(controlP5.get(Textfield.class,"PAR_D").getText()); 
 
   needToUpdateSetupTab = true;
-  needToUpdateSetpoint = true;
+  if(theEvent.isFrom(setpointf)) needToUpdateSetpoint = true;
   needToUpdateParameters = true;
 }
